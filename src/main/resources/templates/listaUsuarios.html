@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
+      layout:decorate="~{layout}">
+
+    <title layout:fragment="titulo">Listado de usuarios</title>
+    <div layout:fragment="body">
+        <div class="row jutify-content-center mb-4">
+            <div class="text-center">
+                <a th:href="@{/usuarios/form/{idusuario}(idusuario=0)}" class="btn btn-success"><i class="bi bi-person"></i>+ Agregar</a>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <form th:action="@{/usuarios/lista}" th:object="${usuariobusqueda}"
+                      method="POST" class=" p-4  mb-4">
+                    <div class="row">
+                        <div class="col-3">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{nombre}" placeholder="Nombre"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-3">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{apellido_paterno}" placeholder="Apellido Paterno"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-3">                         
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{apellido_materno}" placeholder="Apellido materno"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-info">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+                <table id="myTable" class="table table-striped mr-8">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Username</th>
+                            <th>Nombre</th>  
+                            <th>Email</th>
+                            <th>Fecha de Nacimiento</th>
+                            <th>Teléfono</th>
+                            <th>Celular</th>
+                            <th>CURP</th>
+                            <th>Sexo</th>                        
+                            <th>Rol</th>
+                            
+                            <th>Status</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                   
+                        <tr th:each="usuario : ${usuarios}">
+                        
+                            <td>
+                                <img th:if="*{usuario.imagen!=null}" th:src="'data:image/png;base64,' + ${usuario.imagen}" alt="Imagen" style="height:60px" >
+                                <img th:if="*{usuario.imagen==null}" th:src="@{/images/user.png}" alt="imagen" style="height:60px">
+                            </td>
+                            <td th:text="${usuario.username}"></td>
+                            <td th:text="${usuario.nombre} +' '+ ${usuario.apellido_paterno}+' '+ ${usuario.apellido_materno} "></td>                
+                            <td th:text="${usuario.email}"></td>
+                            <td th:text="${usuario.fecha_nacimiento}"></td>
+                            <td th:text="${usuario.telefono}"></td>
+                            <td th:text="${usuario.celular}"></td>
+                            <td th:text="${usuario.curp}"></td>
+                            <td th:text="${usuario.sexo}"></td>
+                            <td th:text="${#strings.capitalizeWords(usuario.rol.nombre)}"></td>
+                            
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input th:if="*{usuario.status>0}" th:value="*{usuario.idusuario}" class="form-check-input" type="checkbox" role="switch" checked onchange="cambiarEstado(this.value)"> 
+                                    <input th:unless="*{usuario.status>0}" th:value="*{usuario.idusuario}" class="form-check-input" type="checkbox" role="switch"  onchange="cambiarEstado(this.value)"> 
+
+                                </div>
+
+                            </td>
+                            <td>
+                                <a th:href="@{/usuarios/form/{idusuario}(idusuario=${usuario.idusuario})}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                            <td>
+
+                                <form method="post"  th:action="@{/usuarios/delete/{idusuario}(idusuario=${usuario.idusuario})}">
+
+                                    <button type="submit" class="btn btn-danger btn-sm"> <i class="bi bi-trash3-fill"></i></button>
+                                </form>
+                            </td>
+                       
+
+                        </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</html>
+<script>
+
+    function cambiarEstado(id) {
+        $.ajax({
+            type: 'POST',
+            url: '/usuarios/cambiarEstadoUsuario',
+            data: {
+                idusuario: id,
+            },
+            success: function () {
+                console.log("estado cambiado!!");
+            },
+            error: function () {
+                alert("Error al cambiar el status.");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#myTable').DataTable();
+    });
+
+</script>

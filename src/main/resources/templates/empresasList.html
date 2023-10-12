@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
+      layout:decorate="~{layout}">
+
+    <title layout:fragment="titulo">Listado de Empresas</title>
+    <div layout:fragment="body">
+        <div class="row jutify-content-center mb-4">
+            <div class="text-center">
+                <a th:href="@{/empresas/form/{idempresa}(idempresa=0)}" class="btn btn-success"><i class="bi bi-building"></i>+ Agregar</a>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <form th:action="@{/empresas/lista}" th:object="${empresabusqueda}"
+                      method="POST" class="offset-5 p-4  mb-4">
+                    <div class="row">
+                        <div class="col-3">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{nombre}" placeholder="Nombre"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        
+                    
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-info">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-striped mr-8">
+                    <thead>
+                        <tr>
+                            <th>Logo</th>
+
+                            <th>Nombre</th>  
+                            <th>Telefono</th>
+
+                            <th>Email</th>
+                            <th>Direccion Web</th>
+
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="empresa : ${empresas}">
+                            <td><img th:src="'data:image/png;base64,' + ${empresa.logo}" alt="Logo" style="height:60px" ></td>
+
+                            <td th:text="${empresa.nombre} "></td>  
+                            <td th:text="${empresa.telefono}"></td>
+                            <td th:text="${empresa.email}"></td>
+
+                            <td th:text="${empresa.direccion_web}"></td>
+
+                            <td>
+                                <a th:href="@{/empresas/form/{idempresa}(idempresa=${empresa.idempresa})}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                            <td>
+
+                                <form method="post"  th:action="@{/empresas/delete/{idempresa}(idempresa=${empresa.idempresa})}">
+
+                                    <button type="submit" class="btn btn-danger btn-sm"> <i class="bi bi-trash3-fill"></i></button>
+                                </form>
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</html>

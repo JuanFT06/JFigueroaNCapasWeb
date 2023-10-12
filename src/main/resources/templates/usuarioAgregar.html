@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Tabla de Usuarios</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"><!--  -->
+        <!--     <link th:href="@{/styles.css}" rel="stylesheet" />-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+        <div class="container mt-4" >
+            <h3 class="text-center">Resgistro de usuarios</h3>
+            <div class="row jutify-content-center mb-4">
+
+
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <form action="#" th:action="@{/usuarios/guardar}" th:object="${usuario}"
+                          method="POST" class="border border-primary p-4 rounded">
+
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="mb-2">Username</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{username}" placeholder="Username"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Nombre</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{nombre}" placeholder="Nombre"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Apellido Paterno</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{apellido_paterno}" placeholder="Apellido paterno"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Apellido Materno</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{apellido_materno}" placeholder="Apellido materno"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="mb-2">Email</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-envelope-at"></i></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{email}" placeholder="Email"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Telefono</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-telephone"></i></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{telefono}" placeholder="Telefono"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                          <div class="col-3">
+                                <label class="mb-2">Celular</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-phone"></i></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{celular}" placeholder="Celular"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Sexo</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-gender-ambiguous"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{sexo}" placeholder="Sexo"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="mb-2">CURP</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-qr-code"></i></div>
+                                    </div>
+                                    <input type="text" th:field="*{curp}" placeholder="CURP"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Fecha de nacimiento</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-calendar"></i></div>
+                                    </div>
+                                    <input type="date" th:field="*{fecha_nacimiento}" 
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                          <div class="col-3">
+                                <label class="mb-2">Password</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-shield-lock"></i></div>
+                                    </div>
+                                    <input type="password" th:field="*{password}" placeholder="Password"
+                                           class="form-control mb-4 col-4"> 
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <label class="mb-2">Rol</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="bi bi-unlock"></i></div>
+                                    </div>
+                                    <select id="rol" name="rol.idrol" required th:field="*{rol.idrol}" class="form-control mb-4">
+
+                                        <option th:each="rol : ${roles}" th:value="${rol.idrol}" th:text="${rol.nombre}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="offset-5">
+                            <button type="submit" class="btn btn-info col-2">Guardar</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
