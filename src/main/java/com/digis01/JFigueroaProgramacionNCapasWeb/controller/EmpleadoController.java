@@ -76,6 +76,39 @@ public class EmpleadoController {
         return "empleadosList";
 
     }
+    @GetMapping("/dependientes")
+    public String getAllTodependiente(Model model) {
+
+        Empleado empleado = new Empleado();
+        empleado.setNombre("");
+        empleado.setApellidoPaterno("");
+        empleado.setApellidoMaterno("");
+        List<Empleado> empleados = new ArrayList<>();
+        Result result = empleadoDAOImplementation.GetAll(empleado);
+        for (Object obj : result.objects) {
+            empleados.add((Empleado) obj);
+        }
+        model.addAttribute("empleadobusqueda", empleado);
+        model.addAttribute("empleados", empleados);
+
+        return "empleadosDependientes";
+
+    }
+
+    @PostMapping("/dependientes")
+    public String getAllTodependiente(Model model, @ModelAttribute("empleadobusqueda") Empleado empleadoBusqueda) {
+
+        List<Empleado> empleados = new ArrayList<>();
+        Result result = empleadoDAOImplementation.GetAll(empleadoBusqueda);
+        for (Object obj : result.objects) {
+            empleados.add((Empleado) obj);
+        }
+        model.addAttribute("empleadobusqueda", empleadoBusqueda);
+        model.addAttribute("empleados", empleados);
+
+        return "empleadosDependientes";
+
+    }
 
     @GetMapping("/form/{numeroempleado}")
     public String mostrarFormulario(Model model, @PathVariable("numeroempleado") String numeroEmpleado) {

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
+      layout:decorate="~{layout}">
+
+    <title layout:fragment="titulo">Listado de Empleados</title>
+    <div layout:fragment="body">
+
+
+        <div class="row">
+            <div class="col-12">
+                <form th:action="@{/empleados/dependientes}" th:object="${empleadobusqueda}"
+                      method="POST" class=" p-4  mb-4">
+                    <div class="row">
+                        <div class="col-3">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{nombre}" placeholder="Nombre"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-3">
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{apellidoPaterno}" placeholder="Apellido Paterno"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-3">                         
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="bi bi-person-circle"></i></div>
+                                </div>
+                                <input type="text" th:field="*{apellidoMaterno}" placeholder="Apellido materno"
+                                       class="form-control mb-4 col-4"> 
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-info">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-striped mr-8">
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+
+                            <th>Nombre</th>  
+                            <th>RFC</th>                       
+                            <th>Telefono</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Empresa</th>
+                            <th>Asignar</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="empleado : ${empleados}">
+                            <td>
+                                <img th:if="*{empleado.foto!=null}" th:src="'data:image/png;base64,' + ${empleado.foto}" alt="Imagen" style="height:60px" >
+                                <img th:if="*{empleado.foto==null}" th:src="@{/images/user.png}" alt="imagen" style="height:60px">
+                            </td>
+
+                            <td th:text="${empleado.nombre}+' '+${empleado.apellidoPaterno}+' '+${empleado.apellidoMaterno} "></td> 
+                            <td th:text="${empleado.rfc}"></td>
+
+
+                            <td th:text="${empleado.telefono}"></td>
+
+                            <td th:text="${empleado.fechaNacimiento}"></td>
+
+
+                            <td th:text="${empleado.empresa.nombre}"></td>
+
+                            <td>
+                                <a th:href="@{/dependientes/lista/{numeroempleado}(numeroempleado=${empleado.numeroEmpleado})}" class="btn btn-success"><i class="bi bi-person-workspace"></i>+ Agregar</a>
+
+                                </a>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</html>

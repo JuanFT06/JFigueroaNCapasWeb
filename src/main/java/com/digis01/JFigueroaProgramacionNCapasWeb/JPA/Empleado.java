@@ -15,6 +15,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,7 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @author digis
  */
 @Entity
-public class Empleado {
+public class Empleado implements Serializable {
     @Id
     @Column(name = "numero_empleado")
     private String numeroEmpleado;

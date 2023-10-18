@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
+      layout:decorate="~{layout}">
+
+    <title layout:fragment="titulo">Listado de Dependientes</title>
+    <div layout:fragment="body">
+        <div class="row jutify-content-center mb-4">
+            <div class="col-3 text-center">
+                <a th:href="@{/dependientes/lista/{numeroempleado}(numeroempleado=${numeroempleado})}"
+                   class="btn btn-primary">Canclear</a>
+            </div>
+            <div class="text-center">
+                <a th:href="@{/dependientes/form/{numeroempleado}/{iddependiente}(numeroempleado=${numeroempleado},iddependiente=0)}"
+                   class="btn btn-success"><i class="bi bi-person-workspace"></i>+ Agregar</a>
+            </div>
+            
+        </div>
+        <h3 th:text="${empleado.nombre}+' '+${empleado.apellidoPaterno}+' '+${empleado.apellidoMaterno} "></h3>
+
+        <div class="row">
+            <div class="col-12">
+
+                <div th:if="${dependientes==null}">
+
+                </div>
+                <div th:unless="${dependientes==null}">
+
+                    <table class="table table-striped mr-8">
+                        <thead>
+                            <tr>
+
+
+                                <th>Nombre</th>  
+                                <th>RFC</th>                       
+                                <th>Telefono</th>
+                                <th>Fecha Nacimiento</th>
+                                <th>Tipo</th>
+                                <th>Editar</th>
+                                <th>Eliminar</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="dependiente : ${dependientes}">
+
+                                <td th:text="${dependiente.nombre}+' '+${dependiente.apellido_paterno}+' '+${dependiente.apellido_materno} "></td> 
+                                <td th:text="${dependiente.rfc}"></td>
+
+
+                                <td th:text="${dependiente.telefono}"></td>
+
+                                <td th:text="${dependiente.fecha_nacimiento}"></td>
+
+
+                                <td th:text="${dependiente.dependienteTipo.nombre}"></td>
+
+                                <td>
+                                    <a th:href="@{/dependientes/form/{numeroempleado}/{iddependiente}(numeroempleado=${numeroempleado},iddependiente=${dependiente.iddependiente})}" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                                <td>
+
+                                    <form method="post"  th:action="@{/dependientes/delete/{iddependiente}(iddependiente=${dependiente.iddependiente})}">
+
+                                        <button type="submit" class="btn btn-danger btn-sm"> <i class="bi bi-trash3-fill"></i></button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</html>
