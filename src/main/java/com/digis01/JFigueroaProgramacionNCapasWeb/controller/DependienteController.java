@@ -11,6 +11,7 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.Result;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Dependiente;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.DependienteTipo;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empleado;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,6 @@ public class DependienteController {
     private DependienteDAOImplementation dependienteDAOImplementation;
     private DependienteTipoDAOImplementation dependienteTipoDAOImplementation;
     private EmpleadoDAOImplementation empleadoDAOImplementation;
-    public String numEmpleado = "";
 
     public DependienteController(DependienteDAOImplementation dependienteDAOImplementation, DependienteTipoDAOImplementation dependienteTipoDAOImplementation,
             EmpleadoDAOImplementation empleadoDAOImplementation) {
@@ -42,7 +42,8 @@ public class DependienteController {
     }
 
     @GetMapping("/lista/{numeroempleado}")
-    public String GetAll(@PathVariable("numeroempleado") String numeroEmpleado, Model model) {
+    public String GetAll(@PathVariable("numeroempleado") String numeroEmpleado, Model model,HttpSession session) {
+        
         Result resultEmpleado = empleadoDAOImplementation.GetById(numeroEmpleado);
         if (resultEmpleado.correct) {
             Empleado empleado = (Empleado) resultEmpleado.object;
@@ -59,6 +60,7 @@ public class DependienteController {
         } else {
             model.addAttribute("dependientes", null);
         }
+        session.setAttribute(numeroEmpleado, model);
         return "dependientesList";
     }
 
@@ -112,11 +114,12 @@ public class DependienteController {
     }
 
     @PostMapping("/delete/{iddependiente}")
-    public String delete(@PathVariable("iddependiente") int iddependiente) {
+    public String delete(@PathVariable("iddependiente") int iddependiente,HttpSession session) {
+       String numeroEmpleado= session.getAttribute("numeroEmpleado").toString();
         Result result = dependienteDAOImplementation.Delete(iddependiente);
 
         if (result.correct) {
-            return "redirect:/empleados/dependientes";
+            return "redirect:/dependientes/lista/"+numeroEmpleado;
         }
         return "dependienteForm";
     }
