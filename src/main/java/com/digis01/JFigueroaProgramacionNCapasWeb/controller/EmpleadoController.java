@@ -4,9 +4,11 @@
  */
 package com.digis01.JFigueroaProgramacionNCapasWeb.controller;
 
+import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.DependienteDAOImplementation;
 import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.EmpleadoDAOImplementation;
 import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.EmpresaDAOImplementation;
 import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.Result;
+import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Dependiente;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empleado;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empresa;
 import com.digis01.JFigueroaProgramacionNCapasWeb.util.Util;
@@ -36,11 +38,13 @@ public class EmpleadoController {
 
     private EmpleadoDAOImplementation empleadoDAOImplementation;
     private EmpresaDAOImplementation empresaDAOImplementation;
-
+    private DependienteDAOImplementation dependienteDAOImplementation;
     @Autowired
-    public EmpleadoController(EmpleadoDAOImplementation empleadoDAOImplementation, EmpresaDAOImplementation empresaDAOImplementation) {
+    public EmpleadoController(EmpleadoDAOImplementation empleadoDAOImplementation,
+            EmpresaDAOImplementation empresaDAOImplementation,DependienteDAOImplementation dependienteDAOImplementation) {
         this.empleadoDAOImplementation = empleadoDAOImplementation;
         this.empresaDAOImplementation = empresaDAOImplementation;
+        this.dependienteDAOImplementation=dependienteDAOImplementation;
     }
 
     @GetMapping("/lista")
@@ -170,8 +174,18 @@ public class EmpleadoController {
 
     @PostMapping("/delete/{numeroempleado}")
     public String delete(@PathVariable("numeroempleado") String numeroEmpleado) {
-        Result result = empleadoDAOImplementation.Delete(numeroEmpleado);
-
+       
+        Result resultDependientes=dependienteDAOImplementation.GetAll(numeroEmpleado);
+        if(resultDependientes.correct){
+            List<Dependiente> dependientes= new ArrayList<>();
+            for(Object object:resultDependientes.objects){
+                dependientes.add((Dependiente) object);
+            }
+            for (Dependiente dependiente:dependientes) {
+              dependienteDAOImplementation.Delete(dependiente.getIddependiente());
+            }
+        }
+         Result result = empleadoDAOImplementation.Delete(numeroEmpleado);
         if (result.correct) {
             return "redirect:/empleados/lista";
         }

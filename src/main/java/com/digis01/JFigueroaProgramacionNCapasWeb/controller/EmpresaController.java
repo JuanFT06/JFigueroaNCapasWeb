@@ -4,8 +4,10 @@
  */
 package com.digis01.JFigueroaProgramacionNCapasWeb.controller;
 
+import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.EmpleadoDAOImplementation;
 import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.EmpresaDAOImplementation;
 import com.digis01.JFigueroaProgramacionNCapasWeb.DAO.Result;
+import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empleado;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empresa;
 import com.digis01.JFigueroaProgramacionNCapasWeb.util.Util;
 import jakarta.validation.Valid;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -32,10 +35,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmpresaController {
 
     private EmpresaDAOImplementation empresaDAOImplementation;
-
+    private EmpleadoDAOImplementation empleadoDAOImplementation;
     @Autowired
-    public EmpresaController(EmpresaDAOImplementation empresaDAOImplementation) {
+    public EmpresaController(EmpresaDAOImplementation empresaDAOImplementation,EmpleadoDAOImplementation empleadoDAOImplementation) {
         this.empresaDAOImplementation = empresaDAOImplementation;
+        this.empleadoDAOImplementation=empleadoDAOImplementation;
     }
 
     @GetMapping("/lista")
@@ -125,6 +129,18 @@ public class EmpresaController {
 
     @PostMapping("/delete/{idempresa}")
     public String delete(@PathVariable("idempresa") int id) {
+        Result resultEmpleado=empleadoDAOImplementation.GetByEmpresa(id);
+        if(resultEmpleado.correct){
+          List<Empleado> empleados= new ArrayList<>();
+          for(Object object:resultEmpleado.objects){
+              empleados.add((Empleado) object);
+          }
+            RestTemplate restTemplate= new RestTemplate();
+          for(Empleado empleado:empleados){
+             restTemplate.postForLocation("http://localhost:8080/empleados/delete/"+empleado.getNumeroEmpleado(), null);
+             // empleadoDAOImplementation.Delete(empleado.getNumeroEmpleado());
+          }
+        }
         Result result = empresaDAOImplementation.Delete(id);
 
         if (result.correct) {

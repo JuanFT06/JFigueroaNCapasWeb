@@ -43,6 +43,11 @@ public class DependienteController {
 
     @GetMapping("/lista/{numeroempleado}")
     public String GetAll(@PathVariable("numeroempleado") String numeroEmpleado, Model model) {
+        Result resultEmpleado = empleadoDAOImplementation.GetById(numeroEmpleado);
+        if (resultEmpleado.correct) {
+            Empleado empleado = (Empleado) resultEmpleado.object;
+            model.addAttribute("empleado", empleado);
+        }
         Result resultDependiente = dependienteDAOImplementation.GetAll(numeroEmpleado);
         if (resultDependiente.correct) {
             List<Dependiente> dependientes = new ArrayList<>();
@@ -50,11 +55,9 @@ public class DependienteController {
                 dependientes.add((Dependiente) object);
             }
             model.addAttribute("dependientes", dependientes);
-            Result resultEmpleado = empleadoDAOImplementation.GetById(numeroEmpleado);
-            if (resultEmpleado.correct) {
-                Empleado empleado = (Empleado) resultEmpleado.object;
-                model.addAttribute("empleado",empleado);
-            }
+
+        } else {
+            model.addAttribute("dependientes", null);
         }
         return "dependientesList";
     }
@@ -113,7 +116,7 @@ public class DependienteController {
         Result result = dependienteDAOImplementation.Delete(iddependiente);
 
         if (result.correct) {
-            return "redirect:/empleados/lista";
+            return "redirect:/empleados/dependientes";
         }
         return "dependienteForm";
     }

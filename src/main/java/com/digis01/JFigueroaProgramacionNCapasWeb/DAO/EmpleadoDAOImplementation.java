@@ -9,6 +9,7 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empresa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -33,9 +34,9 @@ public class EmpleadoDAOImplementation implements IEmpleadoDAO {
             TypedQuery<Object> query = entityManager.createQuery("FROM Empleado where upper(replace(nombre,' ','')) LIKE UPPER(:nombreempleado)"
                     + " AND upper(replace(apellidoPaterno,' ','')) like UPPER(:paterno)"
                     + " AND upper(replace(apellidoMaterno,' ','')) like UPPER(:materno)", Object.class);
-             query.setParameter("nombreempleado", '%'+empleado.getNombre().replace(" ","")+'%');
-            query.setParameter("paterno", '%'+empleado.getApellidoPaterno().replace(" ","")+'%');
-            query.setParameter("materno", '%'+empleado.getApellidoMaterno().replace(" ","")+'%');
+            query.setParameter("nombreempleado", '%' + empleado.getNombre().replace(" ", "") + '%');
+            query.setParameter("paterno", '%' + empleado.getApellidoPaterno().replace(" ", "") + '%');
+            query.setParameter("materno", '%' + empleado.getApellidoMaterno().replace(" ", "") + '%');
             result.objects = query.getResultList();
             result.correct = true;
         } catch (Exception e) {
@@ -117,6 +118,26 @@ public class EmpleadoDAOImplementation implements IEmpleadoDAO {
             result.ex = e;
         }
 
+        return result;
+    }
+
+    @Override
+    public Result GetByEmpresa(int idempresa) {
+        Result result = new Result();
+        try {
+            TypedQuery<Object> query = entityManager.createQuery("SELECT e FROM Empleado e WHERE e.empresa.idempresa=: id", Object.class);
+            query.setParameter("id", idempresa);
+            result.objects = query.getResultList();
+            if(result.objects!=null){
+                result.correct=true;
+            }else{
+               result.correct=false;
+            }
+        } catch (Exception e) {
+            result.correct = false;
+            result.ErrorMessage = e.getLocalizedMessage();
+            result.ex = e;
+        }
         return result;
     }
 

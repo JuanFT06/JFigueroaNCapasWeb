@@ -24,6 +24,6 @@ public interface IUsuarioDAO {
 
     Result Delete(int id);
     
-    List<Usuario> GetByIdRol(int id);
+    Result GetByEmail(String email);
 
 }

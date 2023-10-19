@@ -34,9 +34,9 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
             TypedQuery<Object> query = entityManager.createQuery("FROM Usuario where upper(replace(nombre,' ','')) LIKE UPPER(:nombreusuario)"
                     + " AND upper(replace(apellido_paterno,' ','')) like UPPER(:paterno)"
                     + " AND upper(replace(apellido_materno,' ','')) like UPPER(:materno) ORDER BY idusuario", Object.class);
-            query.setParameter("nombreusuario", '%'+usuario.getNombre().replace(" ","")+'%');
-            query.setParameter("paterno", '%'+usuario.getApellido_paterno().replace(" ","")+'%');
-            query.setParameter("materno", '%'+usuario.getApellido_materno().replace(" ","")+'%');
+            query.setParameter("nombreusuario", '%' + usuario.getNombre().replace(" ", "") + '%');
+            query.setParameter("paterno", '%' + usuario.getApellido_paterno().replace(" ", "") + '%');
+            query.setParameter("materno", '%' + usuario.getApellido_materno().replace(" ", "") + '%');
             result.objects = query.getResultList();
             result.correct = true;
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
         try {
             entityManager.persist(usuario);
             result.correct = true;
-            result.object=usuario;
+            result.object = usuario;
         } catch (Exception e) {
             result.correct = false;
             result.ErrorMessage = e.getLocalizedMessage();
@@ -93,11 +93,11 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
         Result result = new Result();
         try {
             result.object = entityManager.find(Usuario.class, id);
-           if(result.object!=null){
+            if (result.object != null) {
                 result.correct = true;
-           }else{
-               result.correct=false;
-           }
+            } else {
+                result.correct = false;
+            }
         } catch (Exception e) {
             result.ErrorMessage = e.getLocalizedMessage();
             result.correct = false;
@@ -123,13 +123,24 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
     }
 
     @Override
-    public List<Usuario> GetByIdRol(int id) {
-       TypedQuery<Usuario> query= entityManager.createQuery("FROM Usuario WHERE fk(idrol)=:id",Usuario.class);
-       query.setParameter("id", id);
-       List<Usuario> usuarios=query.getResultList();
-       return usuarios;
-    }
+    public Result GetByEmail(String email) {
+        Result result = new Result();
+        try {
+            TypedQuery<Object> query = entityManager.createQuery("SELECT u FROM Usuario u WHERE email=:correo", Object.class);
+            query.setParameter("correo", email);
+            result.object= query.getSingleResult();
+            if (result.object!=null) {
+                result.correct=true;
+            }else{
+                result.correct=false;
+            }
 
-  
+        } catch (Exception e) {
+            result.ErrorMessage = e.getLocalizedMessage();
+            result.correct = false;
+            result.ex = e;
+        }
+        return result;
+    }
 
 }

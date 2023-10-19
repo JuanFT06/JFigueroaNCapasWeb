@@ -16,5 +16,5 @@ public interface IEmpleadoDAO {
     Result Add(Empleado empleado);
     Result Update(Empleado empleado);
     Result Delete(String numero);
-    
+    Result GetByEmpresa(int idempresa);
 }

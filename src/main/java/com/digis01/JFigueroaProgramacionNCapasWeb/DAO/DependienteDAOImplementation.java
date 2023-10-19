@@ -34,8 +34,7 @@ public class DependienteDAOImplementation implements IDependienteDAO {
             TypedQuery<Object> query = entityManager.createQuery("SELECT d FROM Dependiente d WHERE d.empleado.numeroEmpleado = :numero", Object.class);
             query.setParameter("numero", numeroEmpleado);
             result.objects = query.getResultList();
-
-            if (result.objects != null) {
+            if (result.objects.size()>0) {
                 result.correct = true;
             } else {
                 result.correct = false;

@@ -7,14 +7,14 @@
     <div layout:fragment="body">
         <div class="row jutify-content-center mb-4">
             <div class="col-3 text-center">
-                <a th:href="@{/dependientes/lista/{numeroempleado}(numeroempleado=${numeroempleado})}"
-                   class="btn btn-primary">Canclear</a>
+                <a th:href="@{/empleados/dependientes}"
+                   class="btn btn-primary">Cancelar</a>
             </div>
             <div class="text-center">
                 <a th:href="@{/dependientes/form/{numeroempleado}/{iddependiente}(numeroempleado=${numeroempleado},iddependiente=0)}"
                    class="btn btn-success"><i class="bi bi-person-workspace"></i>+ Agregar</a>
             </div>
-            
+
         </div>
         <h3 th:text="${empleado.nombre}+' '+${empleado.apellidoPaterno}+' '+${empleado.apellidoMaterno} "></h3>
 
@@ -22,6 +22,9 @@
             <div class="col-12">
 
                 <div th:if="${dependientes==null}">
+                    <div class="alert alert-danger" role="alert">
+                       Sin dependientes
+                    </div>
 
                 </div>
                 <div th:unless="${dependientes==null}">
