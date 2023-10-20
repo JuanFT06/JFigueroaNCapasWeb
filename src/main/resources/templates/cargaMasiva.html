@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
+      layout:decorate="~{layout}">
+
+    <title layout:fragment="titulo">Listado de Empresas</title>
+    <div layout:fragment="body">
+        <h3 class="text-center" th:if="${idempresa == 0}">Registrar empresa</h3>
+        <h3 class="text-center" th:unless="${idempresa == 0}">Actualizar empresa</h3>
+        <div class="row jutify-content-center mb-4">
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <form  enctype="multipart/form-data"
+                      method="POST" class="border border-primary p-4 rounded mb-4">
+                   
+
+               
+
+                    <div class="offset-5">
+                        <button type="submit" class="btn btn-info col-2" th:if="${idempresa == 0}">Guardar</button>
+                        <button type="submit" class="btn btn-info col-2" th:unless="${idempresa == 0}">Actualizar</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</html>
