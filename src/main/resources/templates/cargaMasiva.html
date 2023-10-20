@@ -3,28 +3,118 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
       layout:decorate="~{layout}">
 
-    <title layout:fragment="titulo">Listado de Empresas</title>
+    <title layout:fragment="titulo">Carga masiva</title>
     <div layout:fragment="body">
-        <h3 class="text-center" th:if="${idempresa == 0}">Registrar empresa</h3>
-        <h3 class="text-center" th:unless="${idempresa == 0}">Actualizar empresa</h3>
+        <h3 class="text-center" >Carga masiva</h3>
+
         <div class="row jutify-content-center mb-4">
 
         </div>
         <div class="row">
             <div class="col-12">
-                <form  enctype="multipart/form-data"
-                      method="POST" class="border border-primary p-4 rounded mb-4">
-                   
+                <form  enctype="multipart/form-data" th:action="@{/carga/subir}"
+                       method="POST" class="border border-primary p-4 rounded mb-4">
 
-               
 
-                    <div class="offset-5">
-                        <button type="submit" class="btn btn-info col-2" th:if="${idempresa == 0}">Guardar</button>
-                        <button type="submit" class="btn btn-info col-2" th:unless="${idempresa == 0}">Actualizar</button>
+                    <div class="mb-5">
+                        <button class="btn btn-primary p-4 col-4" onclick="desplegarBotones(event)">Cargar</button>
                     </div>
+
+                    <div class="row justify-content-around mt-5 d-none" id="botones-carga">
+                        <button class="btn btn-success p-4 col-4" id="btnExcel" onclick="deplegarInput(event, 'btnExcel')">Excel</button>
+                        <button class="btn btn-info p-4 col-4" id="btnTxt" onclick="deplegarInput(event, 'btnTxt')">txt</button>
+                    </div>
+
+                    <div class="row justify-content-around mt-5 ">
+                        <div class="col-4">
+                            <div class="input-group d-none" id="excel-container">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"> <i class="bi bi-file-earmark-richtext"></i></div>
+                                </div>
+                                <input type="file" 
+                                       accept=".xls, .xlsx, application/vnd.ms-excel"
+                                       id="fileExcel"
+                                       name="archivo"
+                                       class="form-control mb-4 col-4" onchange="validarExcel()" > 
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="input-group d-none" id="txt-container">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"> <i class="bi bi-file-earmark-richtext"></i></div>
+                                </div>
+                                <input type="file" 
+                                       accept=".txt"
+                                       id="fileTxt"
+                                       name="archivo"
+                                       class="form-control mb-4 col-4"  onchange="validarTxt()" > 
+                            </div>
+                        </div>
+                        <div class="alert alert-danger d-none" role="alert" id="alertMessage">
+
+                        </div>
+                    </div>
+                    <div>
+                          <button class="btn btn-success p-4 col-4">Procesar</button>
+                    </div>
+
+
 
                 </form>
             </div>
         </div>
     </div>
 </html>
+<script>
+    function validarExcel() {
+        var fileInput = $("#fileExcel")[0];
+        if (fileInput.files.length > 0) {
+            var selectedFile = fileInput.files[0];
+            var allowedTypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
+            
+            if (allowedTypes.indexOf(selectedFile.type) === -1) {
+                $("#alertMessage").removeClass("d-none");
+                $("#alertMessage").text("Por favor, seleccione un archivo Excel válido (XLSX o XLS).");
+                $("#fileExcel").val(""); // Borra el valor del campo de entrada para que el usuario pueda seleccionar otro archivo
+            } else {
+                // Aquí puedes enviar el archivo al servidor o realizar otras acciones
+                $("#alertMessage").text(""); // Limpia el mensaje de error si es válido
+            }
+        } else {
+            $("#alertMessage").text("Por favor, seleccione un archivo.");
+        }
+    }
+    function validarTxt() {
+        var fileInput = $("#fileTxt")[0];
+        if (fileInput.files.length > 0) {
+            var selectedFile = fileInput.files[0];
+            
+            if (selectedFile.type !== "text/plain") {
+                $("#alertMessage").removeClass("d-none");
+                $("#alertMessage").text("Por favor, seleccione un archivo de texto (.txt).");
+                $("#fileTxt").val(""); // Borra el valor del campo de entrada para que el usuario pueda seleccionar otro archivo
+            } else {
+                // Aquí puedes enviar el archivo al servidor o realizar otras acciones
+                $("#alertMessage").text(""); // Limpia el mensaje de error si es válido
+            }
+        } else {
+            $("#alertMessage").text("Por favor, seleccione un archivo.");
+        }
+    }
+    
+    function desplegarBotones(e) {
+        e.preventDefault();
+        $("#botones-carga").removeClass("d-none");
+    }
+    
+    function deplegarInput(e, btn) {
+        e.preventDefault();
+        if (btn == 'btnExcel') {
+            $("#excel-container").removeClass("d-none");
+            $("#txt-container").addClass("d-none");
+        }else if(btn == 'btnTxt'){
+            $("#excel-container").addClass("d-none");
+            $("#txt-container").removeClass("d-none");
+        }
+    }
+</script>
