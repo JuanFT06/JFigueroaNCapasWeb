@@ -11,22 +11,22 @@
 
         </div>
         <div class="row">
-            <div class="col-12">
-                <form  enctype="multipart/form-data" th:action="@{/carga/subir}"
-                       method="POST" class="border border-primary p-4 rounded mb-4">
+            <div class="col-12 border border-primary p-4 rounded mb-4" style="height:
+                 450px">
 
+                <div class="mb-5">
+                    <button class="btn btn-primary p-4 col-4" onclick="desplegarBotones(event)">Cargar</button>
+                </div>
 
-                    <div class="mb-5">
-                        <button class="btn btn-primary p-4 col-4" onclick="desplegarBotones(event)">Cargar</button>
-                    </div>
+                <div class="row justify-content-around mt-5 d-none" id="botones-carga">
+                    <button class="btn btn-success p-4 col-4" id="btnExcel" onclick="deplegarInput(event, 'btnExcel')">Excel</button>
+                    <button class="btn btn-info p-4 col-4" id="btnTxt" onclick="deplegarInput(event, 'btnTxt')">txt</button>
+                </div>
 
-                    <div class="row justify-content-around mt-5 d-none" id="botones-carga">
-                        <button class="btn btn-success p-4 col-4" id="btnExcel" onclick="deplegarInput(event, 'btnExcel')">Excel</button>
-                        <button class="btn btn-info p-4 col-4" id="btnTxt" onclick="deplegarInput(event, 'btnTxt')">txt</button>
-                    </div>
-
-                    <div class="row justify-content-around mt-5 ">
-                        <div class="col-4">
+                <div class="row justify-content-around mt-5 ">
+                    <form  enctype="multipart/form-data" th:action="@{/carga/subir-excel}"
+                           method="POST" class="col-4">
+                        <div>
                             <div class="input-group d-none" id="excel-container">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text"> <i class="bi bi-file-earmark-richtext"></i></div>
@@ -38,7 +38,13 @@
                                        class="form-control mb-4 col-4" onchange="validarExcel()" > 
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div>
+                            <button id="btn-procesar-excel" class="btn btn-success p-4 col-4 d-none">Procesar</button>
+                        </div>
+                    </form>
+                    <form  enctype="multipart/form-data" th:action="@{/carga/subir-txt}"
+                           method="POST" class="col-4">
+                        <div >
                             <div class="input-group d-none" id="txt-container">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text"> <i class="bi bi-file-earmark-richtext"></i></div>
@@ -50,16 +56,47 @@
                                        class="form-control mb-4 col-4"  onchange="validarTxt()" > 
                             </div>
                         </div>
-                        <div class="alert alert-danger d-none" role="alert" id="alertMessage">
-
+                        <div>
+                            <button id="btn-procesar-txt" class="btn btn-success p-4 col-4 d-none">Procesar</button>
                         </div>
+                    </form>
+                    <div class="alert alert-danger d-none" role="alert" id="alertMessage">
+
                     </div>
-                    <div>
-                          <button class="btn btn-success p-4 col-4">Procesar</button>
+                </div>
+
+                <div th:if="${errores}">
+                    <table class="table table-striped mr-8">
+                        <thead>
+                            <tr>
+
+
+                                <th>Fila</th>  
+                                <th>Errores</th>                       
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="error : ${errores}">
+                                <td th:text="${error.Row}"></td>
+                                <td th:text="${error.ErrorMessage}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <form th:action="@{/carga/guardar-excel}"
+                      method="POST">
+                    <div th:if="${showGuardarExcel}">
+                        <button id="btn-guardar" class="offset-4 btn btn-success p-4 col-4">Guardar</button>
                     </div>
-
-
-
+                </form>
+                <form th:action="@{/carga/guardar-txt}"
+                      method="POST">
+                    <div th:if="${showGuardarTxt}">
+                        <button id="btn-guardar" class="offset-4 btn btn-success p-4 col-4">Guardar</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -71,14 +108,16 @@
         if (fileInput.files.length > 0) {
             var selectedFile = fileInput.files[0];
             var allowedTypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
-            
+
             if (allowedTypes.indexOf(selectedFile.type) === -1) {
                 $("#alertMessage").removeClass("d-none");
                 $("#alertMessage").text("Por favor, seleccione un archivo Excel válido (XLSX o XLS).");
                 $("#fileExcel").val(""); // Borra el valor del campo de entrada para que el usuario pueda seleccionar otro archivo
+
             } else {
                 // Aquí puedes enviar el archivo al servidor o realizar otras acciones
                 $("#alertMessage").text(""); // Limpia el mensaje de error si es válido
+                $("#btn-procesar-excel").removeClass("d-none")
             }
         } else {
             $("#alertMessage").text("Por favor, seleccione un archivo.");
@@ -88,31 +127,34 @@
         var fileInput = $("#fileTxt")[0];
         if (fileInput.files.length > 0) {
             var selectedFile = fileInput.files[0];
-            
+
             if (selectedFile.type !== "text/plain") {
                 $("#alertMessage").removeClass("d-none");
                 $("#alertMessage").text("Por favor, seleccione un archivo de texto (.txt).");
-                $("#fileTxt").val(""); // Borra el valor del campo de entrada para que el usuario pueda seleccionar otro archivo
+                $("#fileTxt").val("");
             } else {
-                // Aquí puedes enviar el archivo al servidor o realizar otras acciones
-                $("#alertMessage").text(""); // Limpia el mensaje de error si es válido
+                $("#btn-procesar-txt").removeClass("d-none")
+                $("#alertMessage").text("");
             }
         } else {
             $("#alertMessage").text("Por favor, seleccione un archivo.");
         }
     }
-    
+
     function desplegarBotones(e) {
         e.preventDefault();
+        $("#btn-guardar").addClass("d-none")
         $("#botones-carga").removeClass("d-none");
     }
-    
+
     function deplegarInput(e, btn) {
         e.preventDefault();
+        $("#btn-procesar-excel").addClass("d-none");
+        $("#btn-procesar-txt").addClass("d-none");
         if (btn == 'btnExcel') {
             $("#excel-container").removeClass("d-none");
             $("#txt-container").addClass("d-none");
-        }else if(btn == 'btnTxt'){
+        } else if (btn == 'btnTxt') {
             $("#excel-container").addClass("d-none");
             $("#txt-container").removeClass("d-none");
         }
