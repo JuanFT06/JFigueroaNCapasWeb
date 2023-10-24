@@ -11,9 +11,11 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.util.ResultExcel;
 import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -60,7 +62,7 @@ public class CargaMasivaController {
             String extension = StringUtils.getFilenameExtension(archivo.getOriginalFilename());
             if (extension.equals("xlsx")) {
                 List<Empleado> empleados = leerArchivo(archivo, "");
-                String path = System.getProperty("user.dir") + "/src/main/resources/static/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
+                String path = System.getProperty("user.dir") + "/src/main/resources/static/archivos/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
                 archivo.transferTo(new File(path));
                 if (empleados.size() > 0) {
                     ResultExcel resultExcel = Validar(empleados);
@@ -83,9 +85,9 @@ public class CargaMasivaController {
         if (archivo != null && !archivo.isEmpty()) {
             String extension = StringUtils.getFilenameExtension(archivo.getOriginalFilename());
             if (extension.equals("txt")) {
-                List<Empleado> empleados = CargaMasivaTxt(archivo, "");
+                List<Empleado> empleados = cargaMasivaTxt(archivo, "");
                 if (empleados.size() > 0) {
-                    String path = System.getProperty("user.dir") + "/src/main/resources/static/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
+                    String path = System.getProperty("user.dir") + "/src/main/resources/static/archivos/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
                     archivo.transferTo(new File(path));
                     session.setAttribute("path", path);
                     model.addAttribute("showGuardarTxt", true);
@@ -117,7 +119,7 @@ public class CargaMasivaController {
         String extension = StringUtils.getFilenameExtension(path);
         List<Empleado> empleados = new ArrayList<>();
 
-        empleados = CargaMasivaTxt(null, path);
+        empleados = cargaMasivaTxt(null, path);
 
         for (Empleado empleado : empleados) {
             empleadoDAOImplementation.Add(empleado);
@@ -142,12 +144,13 @@ public class CargaMasivaController {
                 errorMessage += "Falto Apellido Paterno";
             }
 
+            errorMessage += (empleado.getNumeroEmpleado().equals("")) ? "Falto Numero de empleado" : "";
             errorMessage += (empleado.getApellidoMaterno().equals("")) ? "Falto Apellido Materno" : "";
             errorMessage += (empleado.getEmail().equals("")) ? "Falto email" : "";
             errorMessage += (empleado.getTelefono().equals("")) ? "Falto telefono" : "";
-            errorMessage += (empleado.getFechaNacimiento().equals("")) ? "Falto fecha de necimiento" : "";
+            errorMessage += (empleado.getFechaNacimiento()==null) ? "Falto fecha de necimiento" : "";
             errorMessage += (empleado.getNss().equals("")) ? "Falto nss" : "";
-            errorMessage += (empleado.getFechaIngreso().equals("")) ? "Falto fecha de ingreso" : "";
+            errorMessage += (empleado.getFechaIngreso()==null) ? "Falto fecha de ingreso" : "";
             errorMessage += (empleado.getEmpresa().getIdempresa() == 0) ? "Falto id de empresa" : "";
             errorMessage += (empleado.getRfc().equals("")) ? "Falto rfc" : "";
 
@@ -192,20 +195,21 @@ public class CargaMasivaController {
                 Date fechaIngreso = new Date();
                 try {
                     fechaNacimiento = dateFormat.parse(row.getCell(6).toString());
-                    fechaIngreso = dateFormat.parse(row.getCell(8).toString());
+                    empleado.setFechaNacimiento(fechaNacimiento);
                 } catch (ParseException ex) {
-                    try {
-                        fechaNacimiento = dateFormat.parse("09/09/1999");
-                        fechaIngreso = dateFormat.parse("09/09/2009");
-                    } catch (ParseException ex1) {
-                        Logger.getLogger(CargaMasivaController.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
+                    empleado.setFechaNacimiento(null);
                 }
-                empleado.setFechaNacimiento(fechaNacimiento);
+                try {
+                    fechaIngreso = dateFormat.parse(row.getCell(8).toString());
+                    empleado.setFechaIngreso(fechaIngreso);
+                } catch (ParseException ex1) {
+                   empleado.setFechaIngreso(null);
+                }
+
                 empleado.setNss(row.getCell(7).toString());
-                empleado.setFechaIngreso(fechaIngreso);
+
                 Empresa empresa = new Empresa();
-                int idEmpresa=((int) row.getCell(9).getNumericCellValue())>0?(int) row.getCell(9).getNumericCellValue():0;
+                int idEmpresa = ((int) row.getCell(9).getNumericCellValue()) > 0 ? (int) row.getCell(9).getNumericCellValue() : 0;
                 empresa.setIdempresa(idEmpresa);
                 empleado.setEmpresa(empresa);
                 empleado.setRfc(row.getCell(10).toString());
@@ -218,54 +222,66 @@ public class CargaMasivaController {
         return empleados;
     }
 
-    public List<Empleado> CargaMasivaTxt(MultipartFile archivo, String path) {
+    public List<Empleado> cargaMasivaTxt(MultipartFile archivo, String path) {
         List<Empleado> empleados = new ArrayList<>();
-        FileReader fileReader = null;
-        try {
-            if (!path.equals("")) {
+        InputStreamReader reader = null;
+        if (!path.equals("")) {
+            try {
                 File file = new File(path);
-                fileReader = new FileReader(file);
-            } else {
-                fileReader = new FileReader(convert(archivo));
+                reader = new InputStreamReader(new FileInputStream(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+
             }
+        } else {
+            try {
+                reader = new InputStreamReader(archivo.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
 
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            }
+        }
 
-            String fila = bufferedReader.readLine();
-            while ((fila = bufferedReader.readLine()) != null) {
-                String datos[] = fila.split("\\|");
-                Empleado empleado = new Empleado();
-                empleado.setNumeroEmpleado(datos[0]);
-                empleado.setNombre(datos[1]);
-                empleado.setApellidoPaterno(datos[2]);
-                empleado.setApellidoMaterno(datos[3]);
-                empleado.setEmail(datos[4]);
-                empleado.setTelefono(datos[5]);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Reemplaza el formato con el correcto
-                Date fechaNacimiento = new Date();
-                Date fechaIngreso = new Date();
-                try {
-                    fechaNacimiento = dateFormat.parse(datos[6]);
-                    fechaIngreso = dateFormat.parse(datos[8]);
-                } catch (ParseException ex) {
-                    Logger.getLogger(CargaMasivaController.class.getName()).log(Level.SEVERE, null, ex);
+        if (reader != null) {
+            try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+                String fila = bufferedReader.readLine();
+                while ((fila = bufferedReader.readLine()) != null) {
+                    String datos[] = fila.split("\\|");
+
+                    Empleado empleado = new Empleado();
+                    empleado.setNumeroEmpleado(datos[0]);
+                    empleado.setNombre(datos[1]);
+                    empleado.setApellidoPaterno(datos[2]);
+                    empleado.setApellidoMaterno(datos[3]);
+                    empleado.setEmail(datos[4]);
+                    empleado.setTelefono(datos[5]);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Reemplaza el formato con el correcto
+                    Date fechaNacimiento = new Date();
+                    Date fechaIngreso = new Date();
+                    try {
+                        fechaNacimiento = dateFormat.parse(datos[6]);
+                        fechaIngreso = dateFormat.parse(datos[8]);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(CargaMasivaController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    empleado.setFechaNacimiento(fechaNacimiento);
+                    empleado.setNss(datos[7]);
+                    empleado.setFechaIngreso(fechaIngreso);
+                    Empresa empresa = new Empresa();
+                    empresa.setIdempresa(Integer.parseInt(datos[9]));
+                    empleado.setEmpresa(empresa);
+                    empleado.setRfc(datos[10]);
+                    empleados.add(empleado);
                 }
-                empleado.setFechaNacimiento(fechaNacimiento);
-                empleado.setNss(datos[7]);
-                empleado.setFechaIngreso(fechaIngreso);
-                Empresa empresa = new Empresa();
-                empresa.setIdempresa(Integer.parseInt(datos[9]));
-                empleado.setEmpresa(empresa);
-                empleado.setRfc(datos[10]);
-                empleados.add(empleado);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Manejo de excepciones
             }
-        } catch (IOException e) {
-            System.out.println("" + e);
         }
         return empleados;
     }
 
-   public static File convert(MultipartFile file) throws IOException {
+    public static File convert(MultipartFile file) throws IOException {
         File convFile = new File(file.getOriginalFilename());
         file.transferTo(convFile);
         return convFile;
