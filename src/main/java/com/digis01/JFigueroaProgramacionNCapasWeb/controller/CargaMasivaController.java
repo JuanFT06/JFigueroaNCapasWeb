@@ -86,11 +86,18 @@ public class CargaMasivaController {
             String extension = StringUtils.getFilenameExtension(archivo.getOriginalFilename());
             if (extension.equals("txt")) {
                 List<Empleado> empleados = cargaMasivaTxt(archivo, "");
+
+                String path = System.getProperty("user.dir") + "/src/main/resources/static/archivos/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
+                archivo.transferTo(new File(path));
                 if (empleados.size() > 0) {
-                    String path = System.getProperty("user.dir") + "/src/main/resources/static/archivos/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + archivo.getOriginalFilename();
-                    archivo.transferTo(new File(path));
-                    session.setAttribute("path", path);
-                    model.addAttribute("showGuardarTxt", true);
+                    ResultExcel resultExcel = Validar(empleados);
+                    if (resultExcel.getErrores().size() > 0) {
+                        model.addAttribute("errores", resultExcel.getErrores());
+                        return "cargaMasiva";
+                    } else {
+                        session.setAttribute("path", path);
+                        model.addAttribute("showGuardarTxt", true);
+                    }
                 }
             }
         }
@@ -144,15 +151,15 @@ public class CargaMasivaController {
                 errorMessage += "Falto Apellido Paterno";
             }
 
-            errorMessage += (empleado.getNumeroEmpleado().equals("")) ? "Falto Numero de empleado" : "";
-            errorMessage += (empleado.getApellidoMaterno().equals("")) ? "Falto Apellido Materno" : "";
-            errorMessage += (empleado.getEmail().equals("")) ? "Falto email" : "";
-            errorMessage += (empleado.getTelefono().equals("")) ? "Falto telefono" : "";
-            errorMessage += (empleado.getFechaNacimiento()==null) ? "Falto fecha de necimiento" : "";
-            errorMessage += (empleado.getNss().equals("")) ? "Falto nss" : "";
-            errorMessage += (empleado.getFechaIngreso()==null) ? "Falto fecha de ingreso" : "";
-            errorMessage += (empleado.getEmpresa().getIdempresa() == 0) ? "Falto id de empresa" : "";
-            errorMessage += (empleado.getRfc().equals("")) ? "Falto rfc" : "";
+            errorMessage += (empleado.getNumeroEmpleado().equals("")) ? "Falto Numero de empleado, " : "";
+            errorMessage += (empleado.getApellidoMaterno().equals("")) ? "Falto Apellido Materno, " : "";
+            errorMessage += (empleado.getEmail().equals("")) ? "Falto email, " : "";
+            errorMessage += (empleado.getTelefono().equals("")) ? "Falto telefono, " : "";
+            errorMessage += (empleado.getFechaNacimiento() == null) ? "Falto fecha de necimiento, " : "";
+            errorMessage += (empleado.getNss().equals("")) ? "Falto nss, " : "";
+            errorMessage += (empleado.getFechaIngreso() == null) ? "Falto fecha de ingreso, " : "";
+            errorMessage += (empleado.getEmpresa().getIdempresa() == 0) ? "Falto id de empresa, " : "";
+            errorMessage += (empleado.getRfc().equals("")) ? "Falto rfc, " : "";
 
             if (!errorMessage.equals("")) { //Hubo un error
                 ResultExcel resultExcel = new ResultExcel();
@@ -188,8 +195,13 @@ public class CargaMasivaController {
                 empleado.setApellidoPaterno(row.getCell(2).toString());
                 empleado.setApellidoMaterno(row.getCell(3).toString());
                 empleado.setEmail(row.getCell(4).toString());
-                String telefono = (row.getCell(5).getNumericCellValue()) > 0 ? telefono = String.valueOf(row.getCell(5).getNumericCellValue()) : "";
-                empleado.setTelefono(telefono);
+                try {
+                    String telefono = (row.getCell(5).getNumericCellValue()) > 0 ? telefono = String.valueOf(row.getCell(5).getNumericCellValue()) : "";
+                    empleado.setTelefono(telefono);
+                } catch (Exception e) {
+                    empleado.setTelefono("");
+                }
+
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Reemplaza el formato con el correcto
                 Date fechaNacimiento = new Date();
                 Date fechaIngreso = new Date();
@@ -203,14 +215,18 @@ public class CargaMasivaController {
                     fechaIngreso = dateFormat.parse(row.getCell(8).toString());
                     empleado.setFechaIngreso(fechaIngreso);
                 } catch (ParseException ex1) {
-                   empleado.setFechaIngreso(null);
+                    empleado.setFechaIngreso(null);
                 }
 
                 empleado.setNss(row.getCell(7).toString());
 
                 Empresa empresa = new Empresa();
-                int idEmpresa = ((int) row.getCell(9).getNumericCellValue()) > 0 ? (int) row.getCell(9).getNumericCellValue() : 0;
-                empresa.setIdempresa(idEmpresa);
+                try {
+                    int idEmpresa = ((int) row.getCell(9).getNumericCellValue()) > 0 ? (int) row.getCell(9).getNumericCellValue() : 0;
+                    empresa.setIdempresa(idEmpresa);
+                } catch (Exception e) {
+                    empresa.setIdempresa(0);
+                }
                 empleado.setEmpresa(empresa);
                 empleado.setRfc(row.getCell(10).toString());
                 empleados.add(empleado);
@@ -254,21 +270,37 @@ public class CargaMasivaController {
                     empleado.setApellidoPaterno(datos[2]);
                     empleado.setApellidoMaterno(datos[3]);
                     empleado.setEmail(datos[4]);
-                    empleado.setTelefono(datos[5]);
+                    try {
+                        long telefono = Long.parseLong(datos[5]);
+                        empleado.setTelefono(String.valueOf(telefono));
+                    }catch(Exception e){
+                        empleado.setTelefono("");
+                    }
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Reemplaza el formato con el correcto
                     Date fechaNacimiento = new Date();
                     Date fechaIngreso = new Date();
                     try {
                         fechaNacimiento = dateFormat.parse(datos[6]);
-                        fechaIngreso = dateFormat.parse(datos[8]);
+                        empleado.setFechaNacimiento(fechaNacimiento);
                     } catch (ParseException ex) {
-                        Logger.getLogger(CargaMasivaController.class.getName()).log(Level.SEVERE, null, ex);
+                        empleado.setFechaNacimiento(null);
                     }
+                    try {
+                        fechaIngreso = dateFormat.parse(datos[8]);
+                        empleado.setFechaIngreso(fechaIngreso);
+                    } catch (ParseException ex1) {
+                        empleado.setFechaIngreso(null);
+                    }
+
                     empleado.setFechaNacimiento(fechaNacimiento);
                     empleado.setNss(datos[7]);
                     empleado.setFechaIngreso(fechaIngreso);
                     Empresa empresa = new Empresa();
-                    empresa.setIdempresa(Integer.parseInt(datos[9]));
+                    try {
+                        empresa.setIdempresa(Integer.parseInt(datos[9]));
+                    } catch (Exception e) {
+                        empresa.setIdempresa(0);
+                    }
                     empleado.setEmpresa(empresa);
                     empleado.setRfc(datos[10]);
                     empleados.add(empleado);
