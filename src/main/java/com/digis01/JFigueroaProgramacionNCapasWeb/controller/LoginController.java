@@ -57,8 +57,7 @@ public class LoginController {
         } else {
             model.addAttribute("error", true);
             return "Login";
-        }
-       
+        }   
     }
 
     @GetMapping("/logout")

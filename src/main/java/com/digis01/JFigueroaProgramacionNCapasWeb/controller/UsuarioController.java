@@ -21,6 +21,7 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Rol;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Usuario;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.UsuarioDireccion;
 import com.digis01.JFigueroaProgramacionNCapasWeb.util.Util;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,31 +75,35 @@ public class UsuarioController {
     }
 
     @GetMapping("/lista")
-    public String GetAll(Model model) {
+    public String GetAll(Model model, HttpSession session) {
 
-        Usuario usuario = new Usuario();
-        usuario.setNombre("");
-        usuario.setApellido_paterno("");
-        usuario.setApellido_materno("");
-        Result resultd = direccionDAOImpplementation.GetAll();
-        List<Direccion> direcciones = new ArrayList<>();
-        for (Object objeto : resultd.objects) {
-            direcciones.add((Direccion) objeto);
-        }
-        Result result = usuarioDAOImplementation.GetAll(usuario);
-
-        if (result.correct) {
-            List<Usuario> usuarios = new ArrayList<>();
-            for (Object objeto : result.objects) {
-                usuarios.add((Usuario) objeto);
+        if (session.getAttribute("usuario") != null) {
+            Usuario usuario = new Usuario();
+            usuario.setNombre("");
+            usuario.setApellido_paterno("");
+            usuario.setApellido_materno("");
+            Result resultd = direccionDAOImpplementation.GetAll();
+            List<Direccion> direcciones = new ArrayList<>();
+            for (Object objeto : resultd.objects) {
+                direcciones.add((Direccion) objeto);
             }
-            model.addAttribute("direcciones", direcciones);
-            model.addAttribute("usuarios", usuarios);
-            model.addAttribute("usuariobusqueda", new Usuario());
+            Result result = usuarioDAOImplementation.GetAll(usuario);
 
+            if (result.correct) {
+                List<Usuario> usuarios = new ArrayList<>();
+                for (Object objeto : result.objects) {
+                    usuarios.add((Usuario) objeto);
+                }
+                model.addAttribute("direcciones", direcciones);
+                model.addAttribute("usuarios", usuarios);
+                model.addAttribute("usuariobusqueda", new Usuario());
+
+                return "listaUsuarios";
+            }
             return "listaUsuarios";
+        }else{
+            return "redirect:/";
         }
-        return "listaUsuarios";
 
     }
 
@@ -165,8 +170,8 @@ public class UsuarioController {
                     model.addAttribute("estados", estadoDAOImplementation.GetByIdPais(usuarioDireccion.getDireccion().getColonia().getMunicipio().getEstado().getPais().getIdpais()));
                     model.addAttribute("municipios", municipioDAOImplementation.GetByIdEstado(usuarioDireccion.getDireccion().getColonia().getMunicipio().getEstado().getIdestado()));
                     model.addAttribute("colonias", coloniaDAOImplementation.GetByIdMunicipio(usuarioDireccion.getDireccion().getColonia().getMunicipio().getIdmunicipio()));
-                }else{
-                   usuarioDireccion.setDireccion(new Direccion());
+                } else {
+                    usuarioDireccion.setDireccion(new Direccion());
                 }
 
                 model.addAttribute("usuarioDireccion", usuarioDireccion);
