@@ -3,16 +3,16 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layaout"
       layout:decorate="~{layout}">
 
-    <title layout:fragment="titulo" th:if="${iddependiente ==0}">Registrar dependiente</title>
-    <title layout:fragment="titulo" th:unless="${iddependiente == 0}">Actualizar dependiente</title>
+    <title layout:fragment="titulo" th:if="${iddependiente==0 or iddependiente==null}">Registrar dependiente</title>
+    <title layout:fragment="titulo" th:if="${iddependiente !=0 and iddependiente!=null}">Actualizar dependiente</title>
 
 
 
     <div layout:fragment="body">
 
         <div class="row jutify-content-center mb-4">
-            <h3 class="text-center" th:if="${iddependiente == 0}">Registrar dependiente</h3>
-            <h3 class="text-center" th:unless="${iddependiente == 0}">Actualizar dependiente</h3>
+            <h3 class="text-center" th:if="${iddependiente == 0 or iddependiente==null}">Registrar dependiente</h3>
+            <h3 class="text-center" th:if="${iddependiente != 0 and iddependiente!=null}">Actualizar dependiente</h3>
 
             <form th:action="@{/dependientes/form/{numeroempleado}(numeroempleado=${numeroempleado})}" th:object="${dependiente}" enctype="multipart/form-data"
                   method="POST" class="border border-primary p-4 rounded mb-4">
@@ -96,16 +96,20 @@
                         <label  class="text-danger" th:if="${#fields.hasErrors('estado_civil')}" th:errors="*{estado_civil}"></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="bi bi-phone"></i></div>
+                                <div class="input-group-text"><i class="bi bi-building"></i></div>
                             </div>
-                            <input type="text" th:field="*{estado_civil}" placeholder="Estado civil" id="txtCivil"
-                                   maxlength="10"
-                                   class="form-control mb-4 col-4" onkeypress="return sololetras(event, 'lblCivil', 'txtCivil')"> 
+                            <select id="estado_civil" name="estado_civil" required th:field="*{estado_civil}" class="form-control mb-4">
+                                <option value="0">Seleciona una opcion</option>
+                                <option value="soltero/a">Soltero/a</option>
+                                <option value="csado/a">Casado/a</option>
+                                <option value="divorciado/a">Divorciodo/a</option>
+                                <option value="viudo/a">Viudo/a</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-3">
                         <label class="mb-2">Genero</label>
-                        <label id="lblSexo" class="text-danger" th:if="${#fields.hasErrors('genero')}" th:errors="*{genero}"></label>
+                        <label class="text-danger" th:if="${#fields.hasErrors('genero')}" th:errors="*{genero}"></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="bi bi-gender-ambiguous"></i></div>
@@ -127,6 +131,7 @@
 
                     <div class="col-3">
                         <label class="mb-2">RFC</label>
+                         <label class="text-danger" th:if="${#fields.hasErrors('rfc')}" th:errors="*{rfc}"></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="bi bi-qr-code"></i></div>
@@ -143,7 +148,8 @@
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="bi bi-building"></i></div>
                             </div>
-                            <select id="dependientetipo" name="dependienteTipo.idDependienteTipo" required th:field="*{dependienteTipo.idDependienteTipo}" class="form-control mb-4">
+                            <select id="dependientetipo" name="dependienteTipo.idDependienteTipo"
+                                    th:field="*{dependienteTipo.idDependienteTipo}" class="form-control mb-4" required="true">
                                 <option value="0">Seleciona una tipo</option>
                                 <option th:each="tipo : ${tipos}" th:value="${tipo.idDependienteTipo}" th:text="${tipo.nombre}"></option>
                             </select>
@@ -153,15 +159,12 @@
 
                 </div>            <button type="submit" class="btn btn-info col-2" th:if="${numeroempleado == '0'}">Guardar</button>
 
-
-
-
         </div>
 
 
         <div class="offset-5">
-            <button type="submit" class="btn btn-info col-2" th:if="${iddependiente == 0}">Guardar</button>
-            <button type="submit" class="btn btn-info col-2" th:unless="${iddependiente == 0}">Actualizar</button>
+            <button type="submit" class="btn btn-info col-2" th:if="${iddependiente == 0 or iddependiente==null}">Guardar</button>
+            <button type="submit" class="btn btn-info col-2" th:if="${iddependiente != 0 and iddependiente!=null}">Actualizar</button>
             <a th:href="@{/dependientes/lista/{numeroempleado}(numeroempleado=${numeroempleado})}"
                class="btn btn-primary col-2">Canclear</a>
         </div>

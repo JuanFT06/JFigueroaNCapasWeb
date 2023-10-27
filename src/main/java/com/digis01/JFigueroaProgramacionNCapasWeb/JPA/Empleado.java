@@ -15,6 +15,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,21 +30,26 @@ public class Empleado implements Serializable {
     @Column(name = "numero_empleado")
     private String numeroEmpleado;
     @Basic
+    @NotEmpty(message = "Agrega tu RFC")
     @Column(name = "rfc")
     private String rfc;
     @Basic
+    @NotEmpty(message = "Ingresa tu nombre")
     @Column(name = "nombre")
     private String nombre;
     @Basic
+    @NotEmpty(message = "Ingresa tu apellido paterno")
     @Column(name = "apellido_paterno")
     private String apellidoPaterno;
     @Basic
     @Column(name = "apellido_materno")
     private String apellidoMaterno;
     @Basic
+    @NotEmpty(message = "Ingresa tu email")
     @Column(name = "email")
     private String email;
     @Basic
+    @NotEmpty(message = "Ingresa tu telefono")
     @Column(name = "telefono")
     private String telefono;
     @Temporal(TemporalType.DATE)
@@ -51,6 +57,7 @@ public class Empleado implements Serializable {
     @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
     @Basic
+    @NotEmpty(message = "Ingresa tu nss")
     @Column(name = "nss")
     private String nss;
     @Temporal(TemporalType.DATE)

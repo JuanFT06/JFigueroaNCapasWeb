@@ -12,10 +12,12 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Dependiente;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.DependienteTipo;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empleado;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,7 +92,15 @@ public class DependienteController {
     }
 
     @PostMapping("/form/{numeroempleado}")
-    public String guardar(@PathVariable("numeroempleado") String numeroempleado, @ModelAttribute("dependiente") Dependiente dependiente) {
+    public String guardar(@PathVariable("numeroempleado") String numeroempleado, @Valid @ModelAttribute("dependiente") Dependiente dependiente,
+            BindingResult bindingResult,Model model) {
+        
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("dependiente",dependiente);
+            return "dependienteForm";
+        }
+        
+        
         Result resultEmpleado = empleadoDAOImplementation.GetById(numeroempleado);
         if (resultEmpleado.correct) {
             Empleado empleado = (Empleado) resultEmpleado.object;

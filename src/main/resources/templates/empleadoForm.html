@@ -11,8 +11,8 @@
     <div layout:fragment="body">
 
         <div class="row jutify-content-center mb-4">
-            <h3 class="text-center" th:if="${numeroempleado == '0'}">Registrar empleado</h3>
-            <h3 class="text-center" th:unless="${numeroempleado == '0'}">Actualizar empleado</h3>
+            <h3 class="text-center" th:if="${numeroempleado == '0' or numeroempleado == null}">Registrar empleado</h3>
+            <h3 class="text-center" th:if="${numeroempleado != '0' and numeroempleado != null}">Actualizar empleado</h3>
 
             <form th:action="@{/empleados/form}" th:object="${empleado}" enctype="multipart/form-data"
                   method="POST" class="border border-primary p-4 rounded mb-4">
@@ -104,7 +104,7 @@
                     <div class="col-3">
                         <label class="mb-2">Nss</label>
                         <label id="lblNss"></label>
-                        
+                        <label class="text-danger" th:if="${#fields.hasErrors('nss')}" th:errors="*{nss}"></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="bi bi-hospital"></i></div>
@@ -122,6 +122,7 @@
                     
                     <div class="col-3">
                         <label class="mb-2">RFC</label>
+                        <label class="text-danger" th:if="${#fields.hasErrors('rfc')}" th:errors="*{rfc}"></label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text"><i class="bi bi-qr-code"></i></div>
@@ -188,8 +189,8 @@
 
 
                 <div class="offset-5">
-                    <button type="submit" class="btn btn-info col-2" th:if="${numeroempleado == '0'}">Guardar</button>
-                    <button type="submit" class="btn btn-info col-2" th:unless="${numeroempleado == '0'}">Actualizar</button>
+                    <button type="submit" class="btn btn-info col-2" th:if="${numeroempleado == '0' or numeroempleado ==null}">Guardar</button>
+                    <button type="submit" class="btn btn-info col-2" th:if="${numeroempleado != '0' and numeroempleado !=null}">Actualizar</button>
                 </div>
 
             </form>

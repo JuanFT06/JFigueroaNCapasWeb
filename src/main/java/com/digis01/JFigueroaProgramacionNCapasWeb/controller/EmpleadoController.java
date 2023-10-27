@@ -12,6 +12,7 @@ import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Dependiente;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empleado;
 import com.digis01.JFigueroaProgramacionNCapasWeb.JPA.Empresa;
 import com.digis01.JFigueroaProgramacionNCapasWeb.util.Util;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -139,12 +140,12 @@ public class EmpleadoController {
     }
 
     @PostMapping("/form")
-    public String guardar(@ModelAttribute("empleado") Empleado empleado, BindingResult bindingResult, Model model,
+    public String guardar(@Valid @ModelAttribute("empleado") Empleado empleado, BindingResult bindingResult, Model model,
             @RequestParam("imageFile") MultipartFile imageFile) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("empleado", empleado);
-            return "empresaForm";
+            return "empleadoForm";
         }
         String imagen;
 

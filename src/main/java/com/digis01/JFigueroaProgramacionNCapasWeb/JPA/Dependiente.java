@@ -38,10 +38,13 @@ public class Dependiente implements Serializable {
     @Size(max = 10, message = "ingresa un numero de 10 digitos")
     private String telefono;
     private String estado_civil;
-    private String genero;
+    @NotEmpty(message = "Selecciona un genero")
+    private String genero; 
+    @NotEmpty(message = "Ingresa tu RFC")
     private String rfc;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+ 
     private Date fecha_nacimiento;
     @ManyToOne
     @JoinColumn(name = "numero_empleado")

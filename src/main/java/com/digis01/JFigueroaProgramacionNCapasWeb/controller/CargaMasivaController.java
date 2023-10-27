@@ -12,8 +12,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -23,7 +21,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.stereotype.Controller;
@@ -45,7 +42,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 @RequestMapping("/carga")
 public class CargaMasivaController {
 
-    private EmpleadoDAOImplementation empleadoDAOImplementation;
+    private final EmpleadoDAOImplementation empleadoDAOImplementation;
 
     public CargaMasivaController(EmpleadoDAOImplementation empleadoDAOImplementation) {
         this.empleadoDAOImplementation = empleadoDAOImplementation;
@@ -123,7 +120,6 @@ public class CargaMasivaController {
     public String guardarTxt(HttpSession session) {
 
         String path = session.getAttribute("path").toString();
-        String extension = StringUtils.getFilenameExtension(path);
         List<Empleado> empleados = new ArrayList<>();
 
         empleados = cargaMasivaTxt(null, path);
@@ -273,7 +269,7 @@ public class CargaMasivaController {
                     try {
                         long telefono = Long.parseLong(datos[5]);
                         empleado.setTelefono(String.valueOf(telefono));
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         empleado.setTelefono("");
                     }
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Reemplaza el formato con el correcto
@@ -307,7 +303,7 @@ public class CargaMasivaController {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                // Manejo de excepciones
+              
             }
         }
         return empleados;
